@@ -67,6 +67,22 @@ This is a **Next.js App Router** application with TypeScript. All routes live un
 - All secrets and environment variables go in the Vercel dashboard (never in `.env` committed to the repo)
 - API routes run as serverless functions — no long-running background processes or persistent WebSocket connections
 
+## Security (OWASP)
+
+All code must follow OWASP Top 10 principles. Key rules for this stack:
+
+- **Input validation** — validate and sanitize all user input server-side in API routes; never trust client-supplied data
+- **Injection** — use parameterized queries for all database access; never concatenate user input into queries or shell commands
+- **Auth & access control** — every API route and page that handles user data must verify session/auth; use Next.js middleware for route-level protection
+- **Secrets** — secrets live in Vercel environment variables only; never hardcode or expose them in client bundles (`NEXT_PUBLIC_` prefix only for truly public values)
+- **XSS** — avoid `dangerouslySetInnerHTML`; if required, sanitize with a library like `DOMPurify` first
+- **Security headers** — configured in `next.config.ts`; the CSP `unsafe-inline`/`unsafe-eval` directives should be tightened as the app matures
+- **Dependencies** — run `npm audit` regularly; do not ignore high/critical findings
+- **File uploads** — validate MIME type and file size server-side before passing to storage; never execute uploaded files
+- **CSRF** — Next.js Server Actions include built-in CSRF protection; for custom API routes use `SameSite` cookies and verify `Origin`/`Referer` headers
+
+`eslint-plugin-security` is enabled and will flag common issues at lint time.
+
 ## Environment Variables
 
 Document new env vars here as they are added:
