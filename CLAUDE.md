@@ -54,6 +54,18 @@ This is a **Next.js App Router** application with TypeScript. All routes live un
 - `lib/` — Utility functions, API clients, and server-side helpers
 - `public/` — Static assets
 
+### Auth
+
+**Auth.js v5** with Discord OAuth and the Prisma adapter. Key files:
+- `auth.config.ts` — edge-compatible config (providers + callbacks, no DB imports). Used by the proxy.
+- `auth.ts` — full config with PrismaAdapter. Used by API routes and server components.
+- `proxy.ts` — Next.js 16 proxy (replaces `middleware.ts`). Runs in the Edge Runtime using `auth.config.ts` only — never import Prisma here.
+- `app/api/auth/[...nextauth]/route.ts` — Auth.js route handler.
+
+Session strategy is JWT (required when using the Prisma adapter with edge proxy). Access the session server-side via `auth()` from `@/auth`.
+
+Discord OAuth credentials (`AUTH_DISCORD_ID`, `AUTH_DISCORD_SECRET`) come from the Discord Developer Portal. The redirect URI to register is `<domain>/api/auth/callback/discord`. Generate `AUTH_SECRET` with `npx auth secret`.
+
 ### Data & Auth
 
 - Authentication will gate all portal features — collaborators must be verified Endless Era members
@@ -118,5 +130,6 @@ Document new env vars here as they are added:
 |---|---|
 | `DATABASE_URL` | Neon pooled connection string (runtime queries) |
 | `DIRECT_URL` | Neon direct connection string (migrations only) |
-| `NEXTAUTH_SECRET` | NextAuth.js secret |
-| `NEXTAUTH_URL` | Canonical app URL (set to Vercel production URL) |
+| `AUTH_SECRET` | Auth.js secret — generate with `npx auth secret` |
+| `AUTH_DISCORD_ID` | Discord OAuth client ID |
+| `AUTH_DISCORD_SECRET` | Discord OAuth client secret |
