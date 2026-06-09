@@ -9,7 +9,7 @@ The **Endless Era Collaborator Portal** is a Next.js + TypeScript web applicatio
 - Access learning resources for growth and self-promotion (applicable to all content creator types, not just streamers)
 - Upload and host portfolio assets (demo reels, contact sheets, media kits)
 
-Deployed on **Heroku**.
+Deployed on **Vercel**.
 
 ## Next.js Version Note
 
@@ -26,9 +26,6 @@ npm run dev
 
 # Build for production
 npm run build
-
-# Start production server (used by Heroku)
-npm run start
 
 # Lint
 npm run lint
@@ -60,14 +57,15 @@ This is a **Next.js App Router** application with TypeScript. All routes live un
 ### Data & Auth
 
 - Authentication will gate all portal features — collaborators must be verified Endless Era members
-- Portfolio assets (video, images, PDFs) will require file upload handling; consider Vercel Blob, S3, or Cloudinary for storage since Heroku has an ephemeral filesystem
+- Portfolio assets (video, images, PDFs) require external file storage — use Vercel Blob, S3, or Cloudinary (never local disk)
 
-### Heroku deployment
+### Vercel deployment
 
-- The `Procfile` should run `npm start` (which runs `next start`)
-- Heroku requires the `PORT` environment variable to be respected — Next.js handles this automatically
-- Use Heroku Config Vars for all secrets and environment variables (never `.env` committed to the repo)
-- The build runs `npm run build` on the Heroku slug compile step
+- Vercel auto-detects Next.js — no config file needed for standard deployments
+- Pushes to `main` deploy to production automatically via GitHub integration
+- Every PR gets a preview deployment URL
+- All secrets and environment variables go in the Vercel dashboard (never in `.env` committed to the repo)
+- API routes run as serverless functions — no long-running background processes or persistent WebSocket connections
 
 ## Environment Variables
 
@@ -77,4 +75,4 @@ Document new env vars here as they are added:
 |---|---|
 | `DATABASE_URL` | Primary database connection string |
 | `NEXTAUTH_SECRET` | NextAuth.js secret |
-| `NEXTAUTH_URL` | Canonical app URL (set to Heroku app URL in production) |
+| `NEXTAUTH_URL` | Canonical app URL (set to Vercel production URL) |
