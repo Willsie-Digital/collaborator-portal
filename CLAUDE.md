@@ -85,11 +85,13 @@ All code must follow OWASP Top 10 principles. Key rules for this stack:
 
 ## Database
 
-**Neon PostgreSQL** via **Prisma 6**. The schema lives in `prisma/schema.prisma`. The generated client is output to `app/generated/prisma/` (gitignored — regenerate after schema changes). Always import Prisma through the singleton at `lib/prisma.ts`, never instantiate `PrismaClient` directly.
+**Neon PostgreSQL** via **Prisma 7**. The schema lives in `prisma/schema.prisma`. The generated client is output to `app/generated/prisma/` (gitignored — regenerate after schema changes). Always import Prisma through the singleton at `lib/prisma.ts`, never instantiate `PrismaClient` directly.
+
+Prisma 7 no longer supports `url`/`directUrl` in `schema.prisma` — connection URLs live only in `prisma.config.ts` (for the CLI/migrations) and are passed via the `PrismaNeon` adapter in `lib/prisma.ts` (for the app). The client uses the Neon serverless driver (`@prisma/adapter-neon`) which works over WebSockets — required for Vercel's serverless environment.
 
 Neon provides two connection strings — set both in `.env` (locally) and in Vercel environment variables (production):
 - `DATABASE_URL` — pooled connection via PgBouncer (used by the app at runtime)
-- `DIRECT_URL` — direct connection (used by Prisma migrations only)
+- `DIRECT_URL` — direct connection (used by Prisma CLI/migrations via `prisma.config.ts`)
 
 ```bash
 # Generate Prisma client after schema changes
