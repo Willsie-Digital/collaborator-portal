@@ -83,12 +83,38 @@ All code must follow OWASP Top 10 principles. Key rules for this stack:
 
 `eslint-plugin-security` is enabled and will flag common issues at lint time.
 
+## Database
+
+**Neon PostgreSQL** via **Prisma 6**. The schema lives in `prisma/schema.prisma`. The generated client is output to `app/generated/prisma/` (gitignored — regenerate after schema changes). Always import Prisma through the singleton at `lib/prisma.ts`, never instantiate `PrismaClient` directly.
+
+Neon provides two connection strings — set both in `.env` (locally) and in Vercel environment variables (production):
+- `DATABASE_URL` — pooled connection via PgBouncer (used by the app at runtime)
+- `DIRECT_URL` — direct connection (used by Prisma migrations only)
+
+```bash
+# Generate Prisma client after schema changes
+npx prisma generate
+
+# Create and apply a new migration
+npx prisma migrate dev --name <migration-name>
+
+# Apply pending migrations in production
+npx prisma migrate deploy
+
+# Open Prisma Studio (database GUI)
+npx prisma studio
+
+# Push schema changes without a migration file (prototyping only)
+npx prisma db push
+```
+
 ## Environment Variables
 
 Document new env vars here as they are added:
 
 | Variable | Purpose |
 |---|---|
-| `DATABASE_URL` | Primary database connection string |
+| `DATABASE_URL` | Neon pooled connection string (runtime queries) |
+| `DIRECT_URL` | Neon direct connection string (migrations only) |
 | `NEXTAUTH_SECRET` | NextAuth.js secret |
 | `NEXTAUTH_URL` | Canonical app URL (set to Vercel production URL) |
